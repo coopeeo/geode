@@ -11,7 +11,7 @@ jobs:
       - name: Download Development Release
         uses: robinraju/release-downloader@v1.9
         with:
-          tag: nightly
+          tag: new-index-but-better
           fileName: '*'
           tarBall: false
           zipBall: true

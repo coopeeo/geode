@@ -44,13 +44,8 @@ bool ModItem::init(ModSource&& source) {
     m_titleContainer->addChild(m_titleLabel);
 
     m_versionLabel = CCLabelBMFont::create(m_source.getMetadata().getVersion().toString().c_str(), "bigFont.fnt");
-    m_versionLabel->setColor(
-        ColorProvider::get()->define("mod-list-version-label"_spr, ccc3(86, 235, 41))
-    );
-    m_versionLabel->setLayoutOptions(
-        AxisLayoutOptions::create()
-            ->setMaxScale(.7f)
-    );
+    m_versionLabel->setColor(to3B(ColorProvider::get()->color("mod-list-version-label"_spr)));
+    m_versionLabel->setLayoutOptions(AxisLayoutOptions::create()->setMaxScale(.7f));
     m_titleContainer->addChild(m_versionLabel);
     
     m_infoContainer->addChild(m_titleContainer);
@@ -72,17 +67,12 @@ bool ModItem::init(ModSource&& source) {
     );
     m_infoContainer->addChild(m_developers);
 
-    m_restartRequiredLabel = ButtonSprite::create("Restart Required", "bigFont.fnt", "white-square.png"_spr, .8f);
-    m_restartRequiredLabel->m_label->setColor(
-        ColorProvider::get()->define("mod-list-restart-required-label"_spr, ccc3(153, 245, 245))
+    m_restartRequiredLabel = createGeodeTagLabel(
+        "Restart Required",
+        to3B(ColorProvider::get()->color("mod-list-restart-required-label"_spr)),
+        to3B(ColorProvider::get()->color("mod-list-restart-required-label-bg"_spr))
     );
-    m_restartRequiredLabel->m_BGSprite->setColor(
-        ColorProvider::get()->define("mod-list-restart-required-label-bg"_spr, ccc3(123, 156, 163))
-    );
-    m_restartRequiredLabel->setLayoutOptions(
-        AxisLayoutOptions::create()
-            ->setMaxScale(.75f)
-    );
+    m_restartRequiredLabel->setLayoutOptions(AxisLayoutOptions::create()->setMaxScale(.75f));
     m_infoContainer->addChild(m_restartRequiredLabel);
 
     this->addChild(m_infoContainer);
@@ -136,6 +126,10 @@ bool ModItem::init(ModSource&& source) {
 
     this->updateState();
 
+    // Only listen for updates on this mod specifically
+    m_updateStateListener.setFilter(UpdateModListStateFilter(UpdateModState(m_source.getID())));
+    m_updateStateListener.bind([this](auto) { this->updateState(); });
+
     return true;
 }
 
@@ -167,18 +161,24 @@ void ModItem::updateState() {
 
     // Highlight item via BG if it wants to restart for extra UI attention
     if (wantsRestart) {
-        m_bg->setColor({ 153, 245, 245 });
+        m_bg->setColor(to3B(ColorProvider::get()->color("mod-list-restart-required-label"_spr)));
         m_bg->setOpacity(40);
-    }
-
-    // Propagate update up the chain
-    if (m_updateParentState) {
-        m_updateParentState();
     }
 
     // Update enable toggle state
     if (m_enableToggle && m_source.asMod()) {
         m_enableToggle->toggle(m_source.asMod()->isOrWillBeEnabled());
+
+        // Disable the toggle if the mod has been uninstalled
+        if (modRequestedActionIsUninstall(m_source.asMod()->getRequestedAction())) {
+            m_enableToggle->setEnabled(false);
+            auto off = typeinfo_cast<CCRGBAProtocol*>(m_enableToggle->m_offButton->getNormalImage());
+            auto on = typeinfo_cast<CCRGBAProtocol*>(m_enableToggle->m_onButton->getNormalImage());
+            off->setColor(ccGRAY);
+            off->setOpacity(105);
+            on->setColor(ccGRAY);
+            on->setOpacity(105);
+        }
     }
 }
 
@@ -215,10 +215,6 @@ void ModItem::updateSize(float width, bool big) {
     this->updateLayout();
 }
 
-void ModItem::onUpdateParentState(MiniFunction<void()> listener) {
-    m_updateParentState = listener;
-}
-
 ModItem* ModItem::create(ModSource&& source) {
     auto ret = new ModItem();
     if (ret && ret->init(std::move(source))) {
@@ -230,7 +226,8 @@ ModItem* ModItem::create(ModSource&& source) {
 }
 
 void ModItem::onView(CCObject*) {
-    ModPopup::create(ModSource(m_source))->show();
+    // Always open up the popup for the installed mod page if that is possible
+    ModPopup::create(m_source.tryConvertToMod())->show();
 }
 
 void ModItem::onEnable(CCObject*) {
@@ -246,6 +243,6 @@ void ModItem::onEnable(CCObject*) {
         }
     }
 
-    // Update whole state of the mod item
-    this->updateState();
+    // Update state of the mod item
+    UpdateModListStateEvent(UpdateModState(m_source.getID())).post();
 }

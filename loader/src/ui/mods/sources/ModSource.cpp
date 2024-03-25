@@ -4,6 +4,17 @@
 ModSource::ModSource(Mod* mod) : m_value(mod) {}
 ModSource::ModSource(server::ServerModMetadata&& metadata) : m_value(metadata) {}
 
+std::string ModSource::getID() const {
+    return std::visit(makeVisitor {
+        [](Mod* mod) {
+            return mod->getID();
+        },
+        [](server::ServerModMetadata const& metadata) {
+            // Versions should be guaranteed to have at least one item
+            return metadata.id;
+        }
+    }, m_value);
+}
 ModMetadata ModSource::getMetadata() const {
     return std::visit(makeVisitor {
         [](Mod* mod) {
@@ -12,6 +23,28 @@ ModMetadata ModSource::getMetadata() const {
         [](server::ServerModMetadata const& metadata) {
             // Versions should be guaranteed to have at least one item
             return metadata.versions.front().metadata;
+        }
+    }, m_value);
+}
+std::optional<std::string> ModSource::getAbout() const {
+    return std::visit(makeVisitor {
+        [](Mod* mod) {
+            return mod->getMetadata().getDetails();
+        },
+        [](server::ServerModMetadata const& metadata) {
+            // Versions should be guaranteed to have at least one item
+            return metadata.about;
+        }
+    }, m_value);
+}
+std::optional<std::string> ModSource::getChangelog() const {
+    return std::visit(makeVisitor {
+        [](Mod* mod) {
+            return mod->getMetadata().getChangelog();
+        },
+        [](server::ServerModMetadata const& metadata) {
+            // Versions should be guaranteed to have at least one item
+            return metadata.changelog;
         }
     }, m_value);
 }
@@ -37,6 +70,20 @@ bool ModSource::wantsRestart() const {
     }, m_value);
 }
 
+ModSource ModSource::tryConvertToMod() const {
+    return std::visit(makeVisitor {
+        [](Mod* mod) {
+            return ModSource(mod);
+        },
+        [](server::ServerModMetadata const& metadata) {
+            if (auto mod = Loader::get()->getInstalledMod(metadata.id)) {
+                return ModSource(mod);
+            }
+            return ModSource(server::ServerModMetadata(metadata));
+        }
+    }, m_value);
+}
+
 Mod* ModSource::asMod() const {
     auto mod = std::get_if<Mod*>(&m_value);
     return mod ? *mod : nullptr;
@@ -53,6 +100,31 @@ server::ServerPromise<server::ServerModMetadata> ModSource::fetchServerInfo() co
         [](server::ServerModMetadata const& metadata) {
             return server::ServerPromise<server::ServerModMetadata>([&metadata](auto resolve, auto) {
                 resolve(metadata);
+            });
+        }
+    }, m_value);
+}
+
+server::ServerPromise<std::unordered_set<std::string>> ModSource::fetchValidTags() const {
+    return std::visit(makeVisitor {
+        [](Mod* mod) {
+            return server::ServerResultCache<&server::getTags>::shared().get()
+                .then<std::unordered_set<std::string>>([mod](std::unordered_set<std::string> validTags) {
+                    // Filter out invalid tags
+                    auto modTags = mod->getMetadata().getTags();
+                    auto finalTags = std::unordered_set<std::string>();
+                    for (auto& tag : modTags) {
+                        if (validTags.contains(tag)) {
+                            finalTags.insert(tag);
+                        }
+                    }
+                    return finalTags;
+                });
+        },
+        [](server::ServerModMetadata const& metadata) {
+            // Server info tags are always certain to be valid since the server has already validated them
+            return server::ServerPromise<std::unordered_set<std::string>>([&metadata](auto resolve, auto) {
+                resolve(metadata.tags);
             });
         }
     }, m_value);

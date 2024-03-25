@@ -14,7 +14,10 @@ public:
     ModSource(Mod* mod);
     ModSource(server::ServerModMetadata&& metadata);
 
+    std::string getID() const;
     ModMetadata getMetadata() const;
+    std::optional<std::string> getAbout() const;
+    std::optional<std::string> getChangelog() const;
     CCNode* createModLogo() const;
     bool wantsRestart() const;
 
@@ -22,17 +25,13 @@ public:
         return std::visit(func, m_value);
     }
 
+    // Returns a new ModSource that is either a copy of the current source or 
+    // an installed version of a server mod
+    ModSource tryConvertToMod() const;
+
     Mod* asMod() const;
     server::ServerModMetadata const* asServer() const;
 
-    /**
-     * Fetches the server info for this mod source. If the mod source already 
-     * is the `ServerModMetadata` variant, then it just immediately resolves to 
-     * that. Otherwise, it uses the mod ID to fetch the server info.
-     * 
-     * In other words, this does NOT mean that the ModSource is converted to 
-     * `ServerModMetadata` or that it only works for that, or that it's required 
-     * for that
-     */
     server::ServerPromise<server::ServerModMetadata> fetchServerInfo() const;
+    server::ServerPromise<std::unordered_set<std::string>> fetchValidTags() const;
 };

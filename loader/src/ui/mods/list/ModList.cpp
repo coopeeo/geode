@@ -28,9 +28,7 @@ bool ModList::init(ModListSource* src, CCSize const& size) {
     m_searchMenu->setContentSize({ size.width, 30 });
     m_searchMenu->setAnchorPoint({ .5f, 1.f });
 
-    auto searchBG = CCLayerColor::create(
-        ColorProvider::get()->define("mod-list-search-bg"_spr, { 83, 65, 109, 255 })
-    );
+    auto searchBG = CCLayerColor::create(ColorProvider::get()->color("mod-list-search-bg"_spr));
     searchBG->setContentSize(m_searchMenu->getContentSize());
     searchBG->ignoreAnchorPointForPosition(false);
     m_searchMenu->addChildAtPosition(searchBG, Anchor::Center);
@@ -196,7 +194,6 @@ void ModList::onPromise(typename ModListSource::PageLoadEvent* event) {
             }
             first = false;
             m_list->m_contentLayer->addChild(item);
-            item->onUpdateParentState(m_updateParentState);
         }
         this->updateSize(m_bigSize);
 
@@ -321,10 +318,8 @@ void ModList::updatePageNumber() {
     m_pagePrevBtn->setVisible(pageCount && m_page > 0);
     m_pageNextBtn->setVisible(pageCount && m_page < pageCount.value() - 1);
 
-    // Notify container about page count update
-    if (m_updateParentState) {
-        m_updateParentState();
-    }
+    // Post the update page number event
+    UpdateModListStateEvent(UpdatePageNumberState()).post();
 }
 
 void ModList::reloadPage() {
@@ -373,10 +368,6 @@ void ModList::showStatus(ModListStatus status, std::string const& message, std::
 
     // Update layout to automatically rearrange everything neatly in the status
     m_statusContainer->updateLayout();
-}
-
-void ModList::onUpdateParentState(MiniFunction<void()> listener) {
-    m_updateParentState = listener;
 }
 
 void ModList::onFilters(CCObject*) {

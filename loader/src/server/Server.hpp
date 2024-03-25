@@ -42,6 +42,7 @@ namespace server {
         std::unordered_set<std::string> tags;
         std::optional<std::string> about;
         std::optional<std::string> changelog;
+        std::optional<std::string> repository;
         std::optional<ServerDateTime> createdAt;
         std::optional<ServerDateTime> updatedAt;
 
@@ -101,6 +102,9 @@ namespace server {
     ServerPromise<ServerModsList> getMods(ModsQuery const& query);
     ServerPromise<ServerModMetadata> getMod(std::string const& id);
     ServerPromise<ByteVector> getModLogo(std::string const& id);
+    ServerPromise<std::unordered_set<std::string>> getTags(std::monostate = std::monostate());
+
+    // ^^ Note: Any funcs with `std::monostate` parameter is because ServerResultCache expects a single query arg
 
     // Caching for server endpoints
     namespace detail {
@@ -108,6 +112,7 @@ namespace server {
         struct ExtractServerReqParams {
             using Result = R;
             using Query  = Q;
+            ExtractServerReqParams(ServerPromise<R>(*)(Q)) {}
             ExtractServerReqParams(ServerPromise<R>(*)(Q const&)) {}
         };
     }
@@ -209,7 +214,10 @@ namespace server {
             return inst;
         }
         
-        ServerPromise<Result> get(Query const& query) {
+        ServerPromise<Result> get() requires std::is_same_v<Query, std::monostate> {
+            return m_cache.get(Query());
+        }
+        ServerPromise<Result> get(Query const& query) requires (!std::is_same_v<Query, std::monostate>) {
             return m_cache.get(query);
         }
         ServerPromise<Result> refetch(Query const& query) {

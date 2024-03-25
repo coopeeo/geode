@@ -1,5 +1,16 @@
 #include "GeodeStyle.hpp"
 #include <Geode/utils/cocos.hpp>
+#include <Geode/utils/ColorProvider.hpp>
+
+$execute {
+    ColorProvider::get()->define("mod-list-bg"_spr, { 25, 17, 37, 255 });
+    ColorProvider::get()->define("mod-list-version-label"_spr, ccc3(86, 235, 41));
+    ColorProvider::get()->define("mod-list-restart-required-label"_spr, ccc3(153, 245, 245));
+    ColorProvider::get()->define("mod-list-restart-required-label-bg"_spr, ccc3(123, 156, 163));
+    ColorProvider::get()->define("mod-list-search-bg"_spr, { 83, 65, 109, 255 });
+    ColorProvider::get()->define("mod-list-tab-selected-bg"_spr, { 168, 147, 185, 255 });
+    ColorProvider::get()->define("mod-list-tab-selected-bg-alt"_spr, { 147, 163, 185, 255 });
+}
 
 bool GeodeSquareSprite::init(CCSprite* top, bool* state) {
     if (!CCSprite::initWithFile("GE_button_05.png"_spr))
@@ -74,7 +85,25 @@ CircleButtonSprite* createGeodeCircleButton(const char* topFrameName) {
     return CircleButtonSprite::createWithSpriteFrameName(topFrameName, 1.f, CircleBaseColor::DarkPurple);
 }
 
-bool GeodeTabSprite::init(const char* iconFrame, const char* text, float width) {
+ButtonSprite* createGeodeTagLabel(std::string const& text, ccColor3B color, ccColor3B bg) {
+    auto label = ButtonSprite::create(text.c_str(), "bigFont.fnt", "white-square.png"_spr, .8f);
+    label->m_label->setColor(color);
+    label->m_BGSprite->setColor(bg);
+    return label;
+}
+
+std::pair<ccColor3B, ccColor3B> geodeTagColor(std::string_view const& text) {
+    static std::array TAG_COLORS {
+        std::make_pair(ccc3(240, 233, 255), ccc3(130, 123, 163)),
+        std::make_pair(ccc3(234, 255, 245), ccc3(123, 163, 136)),
+        std::make_pair(ccc3(240, 252, 255), ccc3(123, 152, 163)),
+        std::make_pair(ccc3(255, 253, 240), ccc3(163, 157, 123)),
+        std::make_pair(ccc3(255, 242, 240), ccc3(163, 128, 123)),
+    };
+    return TAG_COLORS[hash(text) % 5932 % TAG_COLORS.size()];
+}
+
+bool GeodeTabSprite::init(const char* iconFrame, const char* text, float width, bool altColor) {
     if (!CCNode::init())
         return false;
     
@@ -93,7 +122,11 @@ bool GeodeTabSprite::init(const char* iconFrame, const char* text, float width) 
     m_selectedBG = CCScale9Sprite::createWithSpriteFrameName("tab-bg.png"_spr);
     m_selectedBG->setScale(.8f);
     m_selectedBG->setContentSize(itemSize / .8f);
-    m_selectedBG->setColor({ 168, 147, 185 });
+    m_selectedBG->setColor(to3B(ColorProvider::get()->color(
+        altColor ? 
+            "mod-list-tab-selected-bg-alt"_spr : 
+            "mod-list-tab-selected-bg"_spr
+    )));
     this->addChildAtPosition(m_selectedBG, Anchor::Center);
 
     m_icon = CCSprite::createWithSpriteFrameName(iconFrame);
@@ -108,9 +141,9 @@ bool GeodeTabSprite::init(const char* iconFrame, const char* text, float width) 
     return true;
 }
 
-GeodeTabSprite* GeodeTabSprite::create(const char* iconFrame, const char* text, float width) {
+GeodeTabSprite* GeodeTabSprite::create(const char* iconFrame, const char* text, float width, bool altColor) {
     auto ret = new GeodeTabSprite();
-    if (ret && ret->init(iconFrame, text, width)) {
+    if (ret && ret->init(iconFrame, text, width, altColor)) {
         ret->autorelease();
         return ret;
     }

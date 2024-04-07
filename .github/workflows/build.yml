@@ -304,8 +304,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: nightly
-          name: 'Development Release'
+          tag_name: nightly-main
+          name: 'Development Release for MAIN BRANCH'
           body: |
             Geode development release for commit ${{ github.sha }}. Since this is not a regular release, Geode will not install the resources automatically, so you should use the installer if you want them.
           files: |

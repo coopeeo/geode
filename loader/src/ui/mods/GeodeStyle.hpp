@@ -13,22 +13,12 @@ protected:
         if (!Popup<Args...>::initAnchored(width, height, std::forward<Args>(args)..., (altBG ? "GE_square02.png"_spr : "GE_square01.png"_spr)))
             return false;
         
-        // Store original attributes of the close button
-        auto origSize = Popup<Args...>::m_closeBtn->getContentSize();
-        auto orig = Ref(Popup<Args...>::m_closeBtn->getNormalImage());
-        
-        // Replace the close button with a Geode style one
-        auto spr = CircleButtonSprite::createWithSpriteFrameName(
-            "close.png"_spr, .85f,
-            (altBG ? CircleBaseColor::DarkAqua : CircleBaseColor::DarkPurple)
+        this->setCloseButtonSpr(
+            CircleButtonSprite::createWithSpriteFrameName(
+                "close.png"_spr, .85f,
+                (altBG ? CircleBaseColor::DarkAqua : CircleBaseColor::DarkPurple)
+            )
         );
-        Popup<Args...>::m_closeBtn->setNormalImage(spr);
-
-        // Restore size and position
-        spr->setScale(orig->getScale());
-        spr->setPosition(orig->getPosition());
-        spr->setAnchorPoint(orig->getAnchorPoint());
-        Popup<Args...>::m_closeBtn->setContentSize(origSize);
 
         return true;
     }
@@ -38,6 +28,7 @@ class GeodeSquareSprite : public CCSprite {
 protected:
     bool* m_stateSrc = nullptr;
     bool m_state = false;
+    CCSprite* m_topSprite;
 
     bool init(CCSprite* top, bool* state);
 
@@ -46,6 +37,8 @@ protected:
 public:
     static GeodeSquareSprite* create(const char* top, bool* state = nullptr);
     static GeodeSquareSprite* createWithSpriteFrameName(const char* top, bool* state = nullptr);
+
+    CCSprite* getTopSprite() const;
 };
 
 CCNode* createLoadingCircle(float sideLength, const char* id = "loading-spinner");

@@ -51,7 +51,7 @@ bool ModDevsPopup::setup(ModMetadata const& mod, ModListLayer* list) {
 
 void ModDevsPopup::onViewDev(CCObject* sender) {
     auto str = static_cast<CCString*>(static_cast<CCNode*>(sender)->getUserObject());
-    DevProfilePopup::create(str->getCString(), m_layer)->show();
+    DevProfilePopup<ModListLayer>::create(str->getCString(), m_layer)->show();
 }
 
 ModDevsPopup* ModDevsPopup::create(ModMetadata const& mod, ModListLayer* list) {

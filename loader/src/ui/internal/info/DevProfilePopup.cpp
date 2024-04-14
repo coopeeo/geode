@@ -9,8 +9,8 @@
 #include <type_traits>
 
 
-
-bool DevProfilePopup::setup(std::string const& developer, T* list) {
+template <typename T>
+bool DevProfilePopup<T>::setup(std::string const& developer, T* list) {
     static_assert(std::is_same<T, DevProfilePopup>::value || std::is_same<T, char>::value,
         "Invalid type for T. Only DevProfilePopup and char are allowed.");
     m_noElasticity = true;

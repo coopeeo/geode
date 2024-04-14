@@ -193,7 +193,7 @@ void ModListCell::onViewDev(CCObject*) {
     auto meta = this->getModMetadata();
     if (meta.has_value()) {
         if (meta.value().getDevelopers().size() == 1) {
-            DevProfilePopup::create(meta.value().getDevelopers().front(), m_layer)->show();
+            DevProfilePopup<ModListLayer>::create(meta.value().getDevelopers().front(), m_layer)->show();
         }
         else {
             ModDevsPopup::create(meta.value(), m_layer)->show();

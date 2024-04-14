@@ -14,7 +14,7 @@ UselessClass::UselessClass() {
 
 template <typename T>
 bool DevProfilePopup<T>::setup(std::string const& developer, T* list) {
-    static_assert(std::is_same<T, ModListLayer>::value || std::is_same<T, char>::value,
+    static_assert(std::is_same<T, ModListLayer>::value || std::is_same<T, UselessClass>::value,
         "Invalid type for T. Only ModListLayer and char are allowed.");
     m_noElasticity = true;
     m_layer = list;

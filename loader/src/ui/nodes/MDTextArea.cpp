@@ -274,8 +274,7 @@ void MDTextArea::onGeodeDeveloper(CCObject* pSender) {
     auto href = as<CCString*>(as<CCNode*>(pSender)->getUserObject());
     auto dev = std::string(href->getCString());
     dev = dev.substr(dev.find(":") + 1);
-    auto useless = new UselessClass();
-    DevProfilePopup<UselessClass>::create(dev, &useless)->show();
+    DevProfilePopup<UselessClass>::create(dev, new UselessClass())->show();
 }
 
 void MDTextArea::FLAlert_Clicked(FLAlertLayer* layer, bool btn) {

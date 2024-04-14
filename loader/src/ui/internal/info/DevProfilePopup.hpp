@@ -18,8 +18,8 @@ template <typename T>
 class DevProfilePopup : public Popup<std::string const&, T*> {
 protected:
     T* m_layer;
-    bool m_noElasticity;
-    CCLayer* m_mainLayer;
+    // bool m_noElasticity;
+    // CCLayer* m_mainLayer;
 
     virtual bool setup(std::string const& developer, T* list) override;
 

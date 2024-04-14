@@ -9,7 +9,7 @@
 #include <type_traits>
 
 UselessClass::UselessClass() {
-    m_uselessString = "Very useless indeed.";
+    uselessString = "Very useless indeed.";
 }
 
 template <typename T>

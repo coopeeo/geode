@@ -365,7 +365,7 @@ bool ModCell::init(
     ModListDisplay display,
     CCSize const& size
 ) {
-    if (!ModListCell::init(list, size))
+    if (!ModListCell::init(size))
         return false;
     m_mod = mod;
 
@@ -456,7 +456,7 @@ IndexItemCell* IndexItemCell::create(
     CCSize const& size
 ) {
     auto ret = new IndexItemCell();
-    if (ret && ret->init(item, list, display, size)) {
+    if (ret && ret->init(item, display, size)) {
         return ret;
     }
     CC_SAFE_DELETE(ret);
@@ -522,7 +522,7 @@ bool IndexItemCell::init(
     ModListDisplay display,
     CCSize const& size
 ) {
-    if (!ModListCell::init(list, size))
+    if (!ModListCell::init(size))
         return false;
 
     m_item = item;

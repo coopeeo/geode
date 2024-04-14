@@ -287,7 +287,7 @@ void MDTextArea::onGeodeDeveloper(CCObject* pSender) {
             ->show();
         return;
     }
-    DevProfilePopup::create(dev, false)->show();
+    DevProfilePopup::create(dev, "no")->show();
 }
 
 void MDTextArea::FLAlert_Clicked(FLAlertLayer* layer, bool btn) {

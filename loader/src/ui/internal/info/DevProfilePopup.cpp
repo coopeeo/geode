@@ -6,8 +6,13 @@
 #include "../list/ModListLayer.hpp"
 #include <Geode/utils/ranges.hpp>
 #include <Geode/loader/Mod.hpp>
+#include <type_traits>
+
+
 
 bool DevProfilePopup::setup(std::string const& developer, T* list) {
+    static_assert(std::is_same<T, DevProfilePopup>::value || std::is_same<T, char>::value,
+        "Invalid type for T. Only DevProfilePopup and char are allowed.");
     m_noElasticity = true;
     m_layer = list;
 
@@ -40,9 +45,15 @@ bool DevProfilePopup::setup(std::string const& developer, T* list) {
         if (Loader::get()->isModInstalled(item->getMetadata().getID())) {
             continue;
         }
-        auto cell = IndexItemCell::create(
-            item, m_layer, ModListDisplay::Concise, { 358.f, 40.f }
-        );
+        if constexpr (std::is_same_v<T, ModListLayer>) {
+            auto cell = IndexItemCell::create(
+                item, m_layer, ModListDisplay::Concise, { 358.f, 40.f }
+            );
+        } else {
+            auto cell = IndexItemCell::create(
+                item, ModListDisplay::Concise, { 358.f, 40.f }
+            );
+        }
         cell->disableDeveloperButton();
         items->addObject(cell);
     }
@@ -58,8 +69,9 @@ bool DevProfilePopup::setup(std::string const& developer, T* list) {
     return true;
 }
 
-DevProfilePopup* DevProfilePopup::create(std::string const& developer, T* list) {
-    auto ret = new DevProfilePopup();
+template <typename T>
+DevProfilePopup<T>* DevProfilePopup<T>::create(std::string const& developer, T* list) {
+    auto ret = new DevProfilePopup<T>();
     if (ret && ret->init(420.f, 260.f, developer, list)) {
         ret->autorelease();
         return ret;
@@ -67,3 +79,7 @@ DevProfilePopup* DevProfilePopup::create(std::string const& developer, T* list) 
     CC_SAFE_DELETE(ret);
     return nullptr;
 }
+
+// Explicit instantiation
+template class DevProfilePopup<ModListLayer>;
+template class DevProfilePopup<char>;

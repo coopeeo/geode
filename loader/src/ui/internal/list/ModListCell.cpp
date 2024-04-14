@@ -346,7 +346,7 @@ bool ModCell::init(
             viewSpr->updateBGImage("GE_button_01.png"_spr);
 
             auto minorIndexItem = Index::get()->getItem(
-                mod->getMetadata().l(),
+                mod->getMetadata().getID(),
                 ComparableVersionInfo(mod->getMetadata().getVersion(), VersionCompare::MoreEq)
             );
         }
@@ -404,7 +404,7 @@ bool ModCell::init(
             viewSpr->updateBGImage("GE_button_01.png"_spr);
 
             auto minorIndexItem = Index::get()->getItem(
-                mod->getMetadata().l(),
+                mod->getMetadata().getID(),
                 ComparableVersionInfo(mod->getMetadata().getVersion(), VersionCompare::MoreEq)
             );
         }
@@ -474,7 +474,7 @@ bool IndexItemCell::init(
 
     m_item = item;
 
-    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().l());
+    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().getID());
 
     this->setupInfo(item->getMetadata(), item->getTags().size(), display, justInstalled);
 
@@ -527,7 +527,7 @@ bool IndexItemCell::init(
 
     m_item = item;
 
-    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().l());
+    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().getID());
 
     this->setupInfo(item->getMetadata(), item->getTags().size(), display, justInstalled);
 

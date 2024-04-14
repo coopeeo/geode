@@ -279,7 +279,7 @@ void MDTextArea::onGeodeDeveloper(CCObject* pSender) {
     if (res.ec != std::errc()) {
         FLAlertLayer::create(
             "Error",
-            "Invalid Mod Developer ID: <cr>" + dev +
+            "Invalid Mod Developer: <cr>" + dev +
                 "</c>. This is "
                 "probably the mod developer's fault, report the bug to them.",
             "OK"
@@ -287,7 +287,7 @@ void MDTextArea::onGeodeDeveloper(CCObject* pSender) {
             ->show();
         return;
     }
-    DevProfilePopup::create(dev)->show();
+    DevProfilePopup::create(dev, false)->show();
 }
 
 void MDTextArea::FLAlert_Clicked(FLAlertLayer* layer, bool btn) {

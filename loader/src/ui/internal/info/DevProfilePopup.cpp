@@ -7,7 +7,6 @@
 #include <Geode/utils/ranges.hpp>
 #include <Geode/loader/Mod.hpp>
 
-template <typename T>
 bool DevProfilePopup::setup(std::string const& developer, T* list) {
     m_noElasticity = true;
     m_layer = list;
@@ -59,7 +58,6 @@ bool DevProfilePopup::setup(std::string const& developer, T* list) {
     return true;
 }
 
-template <typename T>
 DevProfilePopup* DevProfilePopup::create(std::string const& developer, T* list) {
     auto ret = new DevProfilePopup();
     if (ret && ret->init(420.f, 260.f, developer, list)) {

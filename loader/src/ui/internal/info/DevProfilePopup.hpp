@@ -18,8 +18,12 @@ template <typename T>
 class DevProfilePopup : public Popup<std::string const&, T*> {
 protected:
     T* m_layer;
-    // bool m_noElasticity;
-    // CCLayer* m_mainLayer;
+
+    // for FLAlertLayer for some reason
+    #ifndef GEODE_IS_WINDOWS
+    bool m_noElasticity;
+    CCLayer* m_mainLayer;
+    #endif
 
     virtual bool setup(std::string const& developer, T* list) override;
 

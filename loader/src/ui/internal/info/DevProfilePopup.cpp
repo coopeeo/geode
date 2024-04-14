@@ -11,8 +11,8 @@
 
 template <typename T>
 bool DevProfilePopup<T>::setup(std::string const& developer, T* list) {
-    static_assert(std::is_same<T, DevProfilePopup>::value || std::is_same<T, char>::value,
-        "Invalid type for T. Only DevProfilePopup and char are allowed.");
+    static_assert(std::is_same<T, ModListLayer>::value || std::is_same<T, char>::value,
+        "Invalid type for T. Only ModListLayer and char are allowed.");
     m_noElasticity = true;
     m_layer = list;
 
@@ -45,12 +45,13 @@ bool DevProfilePopup<T>::setup(std::string const& developer, T* list) {
         if (Loader::get()->isModInstalled(item->getMetadata().getID())) {
             continue;
         }
+        IndexItemCell* cell
         if constexpr (std::is_same_v<T, ModListLayer>) {
-            auto cell = IndexItemCell::create(
+            cell = IndexItemCell::create(
                 item, m_layer, ModListDisplay::Concise, { 358.f, 40.f }
             );
         } else {
-            auto cell = IndexItemCell::create(
+            cell = IndexItemCell::create(
                 item, ModListDisplay::Concise, { 358.f, 40.f }
             );
         }

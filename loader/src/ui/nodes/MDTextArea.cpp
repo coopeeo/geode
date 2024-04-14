@@ -337,7 +337,7 @@ struct MDParser {
                                     : utils::string::startsWith(s_lastLink, "mod:")
                                         ? menu_selector(MDTextArea::onGeodeMod)
                                         : utils::string::startsWith(s_lastLink, "dev:")
-                                            ? menu_selector(MDTextArea::onGeodeMod)
+                                            ? menu_selector(MDTextArea::onGeodeDeveloper)
                                             : menu_selector(MDTextArea::onLink)
                         );
                         for (auto const& label : rendered) {

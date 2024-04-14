@@ -17,6 +17,7 @@
 #include <charconv>
 #include <Geode/loader/Log.hpp>
 #include "../internal/info/ModInfoPopup.hpp"
+#include "../internal/info/DevProfilePopup.hpp"
 
 using namespace geode::prelude;
 
@@ -267,6 +268,26 @@ void MDTextArea::onGeodeMod(CCObject* pSender) {
         )
             ->show();
     }
+}
+
+void MDTextArea::onGeodeDeveloper(CCObject* pSender) {
+    auto href = as<CCString*>(as<CCNode*>(pSender)->getUserObject());
+    auto dev = std::string(href->getCString());
+    dev = dev.substr(profile.find(":") + 1);
+    std::string devName = 0;
+    auto res = std::from_chars(dev.data(), dev.data() + dev.size(), devName);
+    if (res.ec != std::errc()) {
+        FLAlertLayer::create(
+            "Error",
+            "Invalid Mod Developer ID: <cr>" + dev +
+                "</c>. This is "
+                "probably the mod developer's fault, report the bug to them.",
+            "OK"
+        )
+            ->show();
+        return;
+    }
+    DevProfilePopup::create(dev)->show();
 }
 
 void MDTextArea::FLAlert_Clicked(FLAlertLayer* layer, bool btn) {

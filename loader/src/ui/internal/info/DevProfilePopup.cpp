@@ -86,4 +86,4 @@ DevProfilePopup<T>* DevProfilePopup<T>::create(std::string const& developer, T* 
 
 // Explicit instantiation
 template class DevProfilePopup<ModListLayer>;
-template class DevProfilePopup<char>;
+template class DevProfilePopup<UselessClass>;

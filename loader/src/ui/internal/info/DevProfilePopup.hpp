@@ -12,7 +12,7 @@ class UselessClass {
         std::string uselessString;
     public:
         UselessClass();
-}
+};
 
 template <typename T>
 class DevProfilePopup : public Popup<std::string const&, T*> {

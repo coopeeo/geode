@@ -8,10 +8,8 @@
 #include <Geode/loader/Mod.hpp>
 #include <type_traits>
 
-
-UselessClass* UselessClass::s_shared = nullptr;
 UselessClass::UselessClass() {
-    m_uselessString = "Very useless indeed."
+    m_uselessString = "Very useless indeed.";
 }
 
 template <typename T>

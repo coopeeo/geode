@@ -210,6 +210,14 @@ bool ModListCell::init(ModListLayer* list, CCSize const& size) {
     return true;
 }
 
+bool ModListCell::init(CCSize const& size) {
+    m_width = size.width;
+    m_height = size.height;
+    this->setContentSize(size);
+    this->setID("mod-list-cell");
+    return true;
+}
+
 void ModListCell::disableDeveloperButton() {
     m_developerBtn->setEnabled(false);
 }
@@ -224,6 +232,19 @@ ModCell* ModCell::create(
 ) {
     auto ret = new ModCell();
     if (ret && ret->init(mod, list, display, size)) {
+        return ret;
+    }
+    CC_SAFE_DELETE(ret);
+    return nullptr;
+}
+
+ModCell* ModCell::create(
+    Mod* mod,
+    ModListDisplay display,
+    CCSize const& size
+) {
+    auto ret = new ModCell();
+    if (ret && ret->init(mod, display, size)) {
         return ret;
     }
     CC_SAFE_DELETE(ret);
@@ -325,7 +346,65 @@ bool ModCell::init(
             viewSpr->updateBGImage("GE_button_01.png"_spr);
 
             auto minorIndexItem = Index::get()->getItem(
-                mod->getMetadata().getID(),
+                mod->getMetadata().l(),
+                ComparableVersionInfo(mod->getMetadata().getVersion(), VersionCompare::MoreEq)
+            );
+        }
+
+        auto viewBtn = CCMenuItemSpriteExtra::create(viewSpr, this, menu_selector(ModCell::onInfo));
+        m_menu->addChild(viewBtn);
+    }
+
+    this->updateState();
+
+    return true;
+}
+
+bool ModCell::init(
+    Mod* mod,
+    ModListDisplay display,
+    CCSize const& size
+) {
+    if (!ModListCell::init(list, size))
+        return false;
+    m_mod = mod;
+
+    this->setupInfo(mod->getMetadata(), false, display, mod->getRequestedAction() != ModRequestedAction::None);
+
+    auto exMark = CCSprite::createWithSpriteFrameName("exMark_001.png");
+    exMark->setScale(.5f);
+
+    m_unresolvedExMark =
+        CCMenuItemSpriteExtra::create(exMark, this, menu_selector(ModCell::onUnresolvedInfo));
+    m_unresolvedExMark->setVisible(false);
+    m_menu->addChild(m_unresolvedExMark);
+
+    if (mod->getRequestedAction() != ModRequestedAction::None) {
+        auto restartSpr = ButtonSprite::create("Restart", "bigFont.fnt", "GJ_button_03.png", .8f);
+        restartSpr->setScale(.65f);
+
+        auto restartBtn = CCMenuItemSpriteExtra::create(restartSpr, this, menu_selector(ModCell::onRestart));
+        m_menu->addChild(restartBtn);
+    }
+    else {
+        if (!m_mod->isInternal()) {
+            m_enableToggle =
+                CCMenuItemToggler::createWithStandardSprites(this, menu_selector(ModCell::onEnable), .7f);
+            m_menu->addChild(m_enableToggle);
+        }
+
+        auto viewSpr = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_01.png", .8f);
+        viewSpr->setScale(.65f);
+
+        auto latestIndexItem = Index::get()->getMajorItem(
+            mod->getMetadata().getID()
+        );
+
+        if (latestIndexItem && Index::get()->isUpdateAvailable(latestIndexItem)) {
+            viewSpr->updateBGImage("GE_button_01.png"_spr);
+
+            auto minorIndexItem = Index::get()->getItem(
+                mod->getMetadata().l(),
                 ComparableVersionInfo(mod->getMetadata().getVersion(), VersionCompare::MoreEq)
             );
         }
@@ -371,6 +450,19 @@ IndexItemCell* IndexItemCell::create(
     return nullptr;
 }
 
+IndexItemCell* IndexItemCell::create(
+    IndexItemHandle item,
+    ModListDisplay display,
+    CCSize const& size
+) {
+    auto ret = new IndexItemCell();
+    if (ret && ret->init(item, list, display, size)) {
+        return ret;
+    }
+    CC_SAFE_DELETE(ret);
+    return nullptr;
+}
+
 bool IndexItemCell::init(
     IndexItemHandle item,
     ModListLayer* list,
@@ -382,7 +474,60 @@ bool IndexItemCell::init(
 
     m_item = item;
 
-    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().getID());
+    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().l());
+
+    this->setupInfo(item->getMetadata(), item->getTags().size(), display, justInstalled);
+
+    if (justInstalled) {
+        auto restartSpr = ButtonSprite::create("Restart", "bigFont.fnt", "GJ_button_03.png", .8f);
+        restartSpr->setScale(.65f);
+
+        auto restartBtn = CCMenuItemSpriteExtra::create(restartSpr, this, menu_selector(IndexItemCell::onRestart));
+        m_menu->addChild(restartBtn);
+    }
+    else {
+        auto viewSpr = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_01.png", .8f);
+        viewSpr->setScale(.65f);
+
+        auto viewBtn =
+            CCMenuItemSpriteExtra::create(viewSpr, this, menu_selector(IndexItemCell::onInfo));
+        m_menu->addChild(viewBtn);
+    }
+
+    if (item->getTags().size()) {
+        auto tagRow = CCNode::create();
+        tagRow->setContentSize({m_width, m_height});
+        tagRow->setLayout(
+            RowLayout::create()
+                ->setAxisAlignment(AxisAlignment::Start)
+                ->setAutoScale(false)
+                ->setGap(3.f)
+        );
+        m_columnMenu->insertAfter(tagRow, m_developerBtn);
+        for (auto& category : item->getTags()) {
+            auto node = TagNode::create(category);
+            node->setScale(.3f);
+            tagRow->addChild(node);
+        }
+        tagRow->updateLayout();
+    }
+
+    this->updateState();
+
+    return true;
+}
+
+bool IndexItemCell::init(
+    IndexItemHandle item,
+    ModListDisplay display,
+    CCSize const& size
+) {
+    if (!ModListCell::init(list, size))
+        return false;
+
+    m_item = item;
+
+    bool justInstalled = item->isInstalled() && !Loader::get()->isModInstalled(item->getMetadata().l());
 
     this->setupInfo(item->getMetadata(), item->getTags().size(), display, justInstalled);
 

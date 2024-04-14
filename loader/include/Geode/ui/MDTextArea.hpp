@@ -27,8 +27,9 @@ namespace geode {
      * 
      * Note that links also have some special protocols.
      * Use `user:<accountID>` to link to a GD
-     * account; `level:<id>` to link to a GD level and
-     * `mod:<id>` to link to another Geode mod.
+     * account; `level:<id>` to link to a GD level; 
+     * `mod:<id>` to link to another Geode mod and
+     * `dev:<id>` to link to a Geode mod developer.
      */
     class GEODE_DLL MDTextArea :
         public cocos2d::CCLayer,
@@ -50,6 +51,7 @@ namespace geode {
         void onGDProfile(CCObject*);
         void onGDLevel(CCObject*);
         void onGeodeMod(CCObject*);
+        void onGeodeDeveloper(CCObject*);
         void FLAlert_Clicked(FLAlertLayer*, bool btn) override;
 
         friend struct ::MDParser;

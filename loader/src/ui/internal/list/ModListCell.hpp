@@ -30,6 +30,7 @@ protected:
     CCMenu* m_labelMenu = nullptr;
 
     bool init(ModListLayer* list, CCSize const& size);
+    bool init(CCSize const& size);
     void setupInfo(ModMetadata const& metadata, bool spaceForTags, ModListDisplay display, bool inactive);
     void draw() override;
 
@@ -59,6 +60,11 @@ protected:
         ModListDisplay display,
         CCSize const& size
     );
+    bool init(
+        Mod* mod,
+        ModListDisplay display,
+        CCSize const& size
+    );
 
     void onInfo(CCObject*);
     void onRestart(CCObject*);
@@ -69,6 +75,11 @@ public:
     static ModCell* create(
         Mod* mod,
         ModListLayer* list,
+        ModListDisplay display,
+        CCSize const& size
+    );
+    static ModCell* create(
+        Mod* mod,
         ModListDisplay display,
         CCSize const& size
     );
@@ -92,6 +103,12 @@ protected:
         CCSize const& size
     );
 
+    bool init(
+        IndexItemHandle item,
+        ModListDisplay display,
+        CCSize const& size
+    );
+
     void onInfo(CCObject*);
     void onRestart(CCObject*);
 
@@ -99,6 +116,11 @@ public:
     static IndexItemCell* create(
         IndexItemHandle item,
         ModListLayer* list,
+        ModListDisplay display,
+        CCSize const& size
+    );
+    static IndexItemCell* create(
+        IndexItemHandle item,
         ModListDisplay display,
         CCSize const& size
     );

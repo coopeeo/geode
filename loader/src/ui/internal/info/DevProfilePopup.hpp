@@ -11,7 +11,9 @@ protected:
     ModListLayer* m_layer;
 
     bool setup(std::string const& developer, ModListLayer* list) override;
+    bool setup(std::string const& developer) override;
 
 public:
     static DevProfilePopup* create(std::string const& developer, ModListLayer* list);
+    static DevProfilePopup* create(std::string const& developer);
 };

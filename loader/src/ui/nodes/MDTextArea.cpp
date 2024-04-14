@@ -328,7 +328,9 @@ struct MDParser {
                                     ? menu_selector(MDTextArea::onGDLevel)
                                     : utils::string::startsWith(s_lastLink, "mod:")
                                         ? menu_selector(MDTextArea::onGeodeMod)
-                                        : menu_selector(MDTextArea::onLink)
+                                        : utils::string::startsWith(s_lastLink, "dev:")
+                                            ? menu_selector(MDTextArea::onGeodeMod)
+                                            : menu_selector(MDTextArea::onLink)
                         );
                         for (auto const& label : rendered) {
                             label.m_node->setUserObject(CCString::create(s_lastLink));

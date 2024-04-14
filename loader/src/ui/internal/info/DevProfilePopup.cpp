@@ -45,7 +45,7 @@ bool DevProfilePopup<T>::setup(std::string const& developer, T* list) {
         if (Loader::get()->isModInstalled(item->getMetadata().getID())) {
             continue;
         }
-        IndexItemCell* cell
+        IndexItemCell* cell;
         if constexpr (std::is_same_v<T, ModListLayer>) {
             cell = IndexItemCell::create(
                 item, m_layer, ModListDisplay::Concise, { 358.f, 40.f }

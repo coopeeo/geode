@@ -19,7 +19,7 @@ class DevProfilePopup : public Popup<std::string const&, T*> {
 protected:
     T* m_layer;
     bool m_noElasticity;
-    CCLayerColor* m_mainLayer;
+    CCLayer* m_mainLayer;
 
     virtual bool setup(std::string const& developer, T* list) override;
 

@@ -15,7 +15,7 @@ class UselessClass {
 };
 
 template <typename T>
-class DevProfilePopup : public Popup<std::string const&, T*> {
+class DevProfilePopup : public Popup<std::string const&, T*>, public FLAlertLayer {
 protected:
     T* m_layer;
     // bool m_noElasticity;

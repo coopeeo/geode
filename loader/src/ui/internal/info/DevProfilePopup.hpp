@@ -6,7 +6,13 @@
 using namespace geode::prelude;
 
 class ModListLayer;
-class UselessClass;
+
+class UselessClass {
+    protected:
+        std::string uselessString;
+    public:
+        UselessClass();
+}
 
 template <typename T>
 class DevProfilePopup : public Popup<std::string const&, T*> {

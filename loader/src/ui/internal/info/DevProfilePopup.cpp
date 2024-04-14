@@ -9,6 +9,11 @@
 #include <type_traits>
 
 
+UselessClass* UselessClass::s_shared = nullptr;
+UselessClass::UselessClass() {
+    m_uselessString = "Very useless indeed."
+}
+
 template <typename T>
 bool DevProfilePopup<T>::setup(std::string const& developer, T* list) {
     static_assert(std::is_same<T, ModListLayer>::value || std::is_same<T, char>::value,
